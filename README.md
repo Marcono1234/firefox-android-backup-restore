@@ -45,55 +45,69 @@ The following are also relevant for consistency, but not critical:
 
 ## Backup
 
-To backup, prepare to receive the backup data in the terminal:
+Optionally before performing the backup clear the app cache of the Firefox app
+to reduce the size of the backup.
 
-```sh
-adb reverse tcp:12101 tcp:12101
-nc -l -s 127.0.0.1 -p 12101 > firefox-android-backup.tar.gz
-```
+1. To backup, prepare to receive the backup data in the terminal:
+    ```sh
+    adb reverse tcp:12101 tcp:12101
+    nc -l -s 127.0.0.1 -p 12101 > firefox-android-backup.tar.gz
+    ```
 
-Open the Firefox app on your phone, and visit `about:blank` (any webpage works).
-Copy the contents of [`snippets_for_firefox_debugging.js`](snippets_for_firefox_debugging.js).
-Open `about:debugging`, scroll down to "Main Process" and click on Inspect.
-Switch to the Console, paste the code and run it. Then type and run:
+    On MacOS you might have to use `nc -l 127.0.0.1 12101 > ...` ([issue #3](https://github.com/Rob--W/firefox-android-backup-restore/issues/3)).\
+    On Windows you can use [ncat](https://nmap.org/ncat/) with `ncat -l 127.0.0.1 -p 12101 > ...`.
 
-```js
-fab_backup_create();
-```
+3. Open the Firefox app on your phone, and visit `about:blank` (any webpage works).
+4. On your PC, open `about:debugging` in Firefox
+5. Set up a debug connection to the Android app, as described in the [requirements section](#requirements)
+6. On your PC, for the debugged Android app, scroll down to "Main Process", click on "Inspect" and open the "Console" tab.
+7. Copy the contents of [`snippets_for_firefox_debugging.js`](snippets_for_firefox_debugging.js).
+8. Paste the code you copied into the Console run it.
+9. In the Console run the following to make sure the script is functional:
+    ```js
+    fab_sanity_check();
+    ```
+10. Then type and run:
+    ```js
+    fab_backup_create();
+    ```
 
-This copies [relevant files](#relevant-files) to `firefox-android-backup.tar.gz`
-without changing any data, except for one log file. To remove the log file, run:
+    This copies [relevant files](#relevant-files) to `firefox-android-backup.tar.gz`.
+    Wait until "Backup successfully created and transferred!" appears on the Console.
 
-```js
-fab_cleanup();
-```
+    If the script fails, saying it cannot find `nc`, see [issue #2](https://github.com/Rob--W/firefox-android-backup-restore/issues/2).
+11. Close the reverse connection you opened earlier for the transfer:
+     ```sh
+     adb reverse –-remove tcp:12101
+     ```
+12. Optionally to remove the temporary backup file and the log file run:
+    ```js
+    fab_cleanup();
+    ```
 
 ## Restore
 
 The steps below will replace [relevant files](#relevant-files) with the backup.
 
-To restore the profile from the backup, put the backup archive on the device:
-
-```sh
-adb shell mkdir /sdcard/Android/data/org.mozilla.firefox/
-adb push firefox-android-backup.tar.gz /sdcard/Android/data/org.mozilla.firefox/
-```
-
-Open the Firefox app on your phone, and visit `about:blank` (any webpage works).
-Copy the contents of [`snippets_for_firefox_debugging.js`](snippets_for_firefox_debugging.js).
-Open `about:debugging`, scroll down to "Main Process" and click on Inspect.
-Switch to the Console, paste the code and run it.
-
-Then type `fab_backup_restore();` and run it. This has no visible output, unless
-an error occurs. Upon successful completion, the app is killed to prevent the
-old app instance from corrupting the restored data. The logs can be viewed with:
-
-```sh
-adb shell cat /sdcard/Android/data/org.mozilla.firefox/firefox-android-backup.log
-```
-
-When you are done, remove the archive and log file with:
-
-```js
-fab_cleanup();
-```
+1. To restore the profile from the backup, put the backup archive on the device:
+    ```sh
+    adb shell mkdir /sdcard/Android/data/org.mozilla.firefox/
+    adb push firefox-android-backup.tar.gz /sdcard/Android/data/org.mozilla.firefox/
+    ```
+2. Open the Firefox app on your phone, and visit `about:blank` (any webpage works).
+3. On your PC, open `about:debugging` in Firefox
+4. Set up a debug connection to the Android app, as described in the [requirements section](#requirements)
+5. On your PC, for the debugged Android app, scroll down to "Main Process", click on "Inspect" and open the "Console" tab.
+6. Copy the contents of [`snippets_for_firefox_debugging.js`](snippets_for_firefox_debugging.js).
+7. Paste the code you copied into the Console run it.
+8. Then type `fab_backup_restore();` and run it. This has no visible output, unless
+  an error occurs. Upon successful completion, the app is killed to prevent the
+  old app instance from corrupting the restored data.\
+  The logs can be viewed with:
+    ```sh
+    adb shell cat /sdcard/Android/data/org.mozilla.firefox/firefox-android-backup.log
+    ```
+9. When you are done, remove the archive and log file with:
+    ```js
+    fab_cleanup();
+    ```
