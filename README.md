@@ -78,7 +78,7 @@ to reduce the size of the backup.
     If the script fails, saying it cannot find `nc`, see [issue #2](https://github.com/Rob--W/firefox-android-backup-restore/issues/2).
 11. Close the reverse connection you opened earlier for the transfer:
      ```sh
-     adb reverse –-remove tcp:12101
+     adb reverse --remove tcp:12101
      ```
 12. Optionally to remove the temporary backup file and the log file run:
     ```js
