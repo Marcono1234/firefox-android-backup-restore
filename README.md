@@ -62,7 +62,7 @@ to reduce the size of the backup.
 5. Set up a debug connection to the Android app, as described in the [requirements section](#requirements)
 6. On your PC, for the debugged Android app, scroll down to "Main Process", click on "Inspect" and open the "Console" tab.
 7. Copy the contents of [`snippets_for_firefox_debugging.js`](snippets_for_firefox_debugging.js).
-8. Paste the code you copied into the Console run it.
+8. Paste the code into the Console and run it.
 9. In the Console run the following to make sure the script is functional:
     ```js
     fab_sanity_check();
@@ -99,7 +99,7 @@ The steps below will replace [relevant files](#relevant-files) with the backup.
 4. Set up a debug connection to the Android app, as described in the [requirements section](#requirements)
 5. On your PC, for the debugged Android app, scroll down to "Main Process", click on "Inspect" and open the "Console" tab.
 6. Copy the contents of [`snippets_for_firefox_debugging.js`](snippets_for_firefox_debugging.js).
-7. Paste the code you copied into the Console run it.
+7. Paste the code into the Console and run it.
 8. Then type `fab_backup_restore();` and run it. This has no visible output, unless
   an error occurs. Upon successful completion, the app is killed to prevent the
   old app instance from corrupting the restored data.\
@@ -107,7 +107,7 @@ The steps below will replace [relevant files](#relevant-files) with the backup.
     ```sh
     adb shell cat /sdcard/Android/data/org.mozilla.firefox/firefox-android-backup.log
     ```
-9. When you are done, remove the archive and log file with:
+9. When you are done, reopen the app and restore the debug connection, then paste the contents of the snippets in the Console again and run the following to remove the archive and log file:
     ```js
     fab_cleanup();
     ```
